@@ -28,6 +28,7 @@ function Login() {
             } else {
                 navigate("/");
             }
+                  window.location.reload();
         } catch (error) {
             Swal.fire("Error", "Wrong username or password", "error")
             setForm({ email: "", password: "" });
