@@ -37,7 +37,7 @@ function SubmitRequest() {
         }
 
         try {
-            const response = await axios.post("http://localhost:8081/api/requests", form);
+            const response = await axios.post("https://campusconnect-1od1.onrender.com/api/requests", form);
             Swal.fire("Success", response.data.message, "success");
             setForm({ name: "", email: "", subject: "", message: "" }); 
         } catch (err) {
