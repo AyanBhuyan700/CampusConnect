@@ -16,7 +16,7 @@ function UniversityAdmin() {
 
     const getUniversities = async () => {
         try {
-            const { data } = await axios.get("http://localhost:8081/university");
+            const { data } = await axios.get("https://campusconnect-1od1.onrender.com/university");
             setUniversities(data.univData || []);
         } catch (error) {
             Swal.fire("Error", "Unable to fetch universities", "error");
@@ -57,8 +57,8 @@ function UniversityAdmin() {
 
         try {
             const response = universityId
-                ? await axios.put("http://localhost:8081/university", formData, { headers: { "Content-Type": "multipart/form-data" } })
-                : await axios.post("http://localhost:8081/university", formData, { headers: { "Content-Type": "multipart/form-data" } });
+                ? await axios.put("https://campusconnect-1od1.onrender.com/university", formData, { headers: { "Content-Type": "multipart/form-data" } })
+                : await axios.post("https://campusconnect-1od1.onrender.com/university", formData, { headers: { "Content-Type": "multipart/form-data" } });
 
             Swal.fire("Success", response.data.message, "success");
             getUniversities();
@@ -85,7 +85,7 @@ function UniversityAdmin() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const { data } = await axios.delete("http://localhost:8081/university", { data: { id } });
+                    const { data } = await axios.delete("https://campusconnect-1od1.onrender.com/university", { data: { id } });
                     Swal.fire("Deleted!", data.message, "success");
                     getUniversities();
                 } catch (error) {
@@ -144,7 +144,7 @@ function UniversityAdmin() {
                             {/* University Image */}
                             <td>
                                 <img
-                                    src={`http://localhost:8081/${item.image}`}
+                                    src={`https://campusconnect-1od1.onrender.com/${item.image}`}
                                     className="img-thumbnail rounded-circle border shadow-sm"
                                     width="80"
                                     height="80"
