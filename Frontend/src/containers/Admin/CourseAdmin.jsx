@@ -24,7 +24,7 @@ function CourseAdmin() {
 
   function getCoursesByDepartmentId() {
     try {
-      axios.get("http://localhost:8081/courses?departmentId=" + query.get("id")).then((c) => {
+      axios.get("https://campusconnect-1od1.onrender.com/courses?departmentId=" + query.get("id")).then((c) => {
         setCourses(c.data.crsData)
       })
     } catch (err) {
@@ -47,7 +47,7 @@ function CourseAdmin() {
       formData.append("duration", form.duration);
       formData.append("image", form.image, form.image.name);
       formData.append("departmentId", query.get("id"));
-      axios.post("http://localhost:8081/courses", formData, {
+      axios.post("https://campusconnect-1od1.onrender.com/courses", formData, {
         "content-type": "multipart/form-data",
       }).then((c) => {
         Swal.fire("Success", c.data.message, "success");
@@ -84,7 +84,7 @@ function CourseAdmin() {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.put("http://localhost:8081/courses", formData, {
+          axios.put("https://campusconnect-1od1.onrender.com/courses", formData, {
             "content-type": "multipart/form-data",
           }).then((c) => {
             Swal.fire("Success", c.data.message, "success");
@@ -109,7 +109,7 @@ function CourseAdmin() {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.delete("http://localhost:8081/courses", { data: { id: id } }).then((c) => {
+          axios.delete("https://campusconnect-1od1.onrender.com/courses", { data: { id: id } }).then((c) => {
             Swal.fire("Success", c.data.message, "success");
             getCoursesByDepartmentId()
             resetForm()
@@ -170,7 +170,7 @@ function CourseAdmin() {
     return courses?.map((item) => (
       <tr className="text-center align-middle">
         <td>
-          <img src={`http://localhost:8081/` + item.image} className="img-thumbnail" width="100" height="100" alt="Course" />
+          <img src={`https://campusconnect-1od1.onrender.com/` + item.image} className="img-thumbnail" width="100" height="100" alt="Course" />
         </td>
         <td>{item.name}</td>
         <td>{item.code}</td>
