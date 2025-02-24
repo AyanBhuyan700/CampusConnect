@@ -14,7 +14,7 @@ function Home() {
   }, []);
 
   function getAllUniversities() {
-    axios.get("http://localhost:8081/university")
+    axios.get("https://campusconnect-1od1.onrender.com/university")
       .then((response) => {
         setUniversities(response.data.univData);
         setFilteredUniversities(response.data.univData);
@@ -37,7 +37,7 @@ function Home() {
   const columns = [
     {
       name: 'Image',
-      selector: row => <img src={`http://localhost:8081/${row.image}`} alt="University" width="100" height="100" style={{ objectFit: "cover" }} />,
+      selector: row => <img src={`https://campusconnect-1od1.onrender.com/${row.image}`} alt="University" width="100" height="100" style={{ objectFit: "cover" }} />,
     },
     {
       name: 'Name',
