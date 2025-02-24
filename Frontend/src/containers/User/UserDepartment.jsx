@@ -21,7 +21,7 @@ function UserDepartment() {
 
   function getDepartmentsByUniversityId() {
     axios
-      .get("http://localhost:8081/department?universityId=" + query.get("id"))
+      .get("https://campusconnect-1od1.onrender.com/department?universityId=" + query.get("id"))
       .then((response) => {
         setDepartments(response.data.depData);
         setFilteredDepartments(response.data.depData);
@@ -44,7 +44,7 @@ function UserDepartment() {
       name: "Image",
       selector: (row) => (
         <img
-          src={`http://localhost:8081/${row.image}`}
+          src={`https://campusconnect-1od1.onrender.com/${row.image}`}
           alt={row.name}
           style={{ width: "120px", height: "90px", objectFit: "cover" }}
         />
