@@ -24,7 +24,7 @@ function Register() {
     };
 
     function registerUser() {
-        axios.post("http://localhost:8081/register", form)
+        axios.post("https://campusconnect-1od1.onrender.com/register", form)
             .then((d) => {
                 Swal.fire("Success", d.data.message, "success");
                 navigate('/login');
