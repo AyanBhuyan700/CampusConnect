@@ -25,7 +25,7 @@ function DepartmentAdmin() {
 
   function getDepartmentByUniversityId() {
     try {
-      axios.get("http://localhost:8081/department?universityId=" + query.get("id")).then((d) => {
+      axios.get("https://campusconnect-1od1.onrender.com/department?universityId=" + query.get("id")).then((d) => {
         setDepartments(d.data.depData)
       })
     } catch (err) {
@@ -45,7 +45,7 @@ function DepartmentAdmin() {
       formData.append("facultyCount", form.facultyCount)
       formData.append("image", form.image, form.image.name)
       formData.append("universityId", query.get("id"))
-      axios.post("http://localhost:8081/department", formData, {
+      axios.post("https://campusconnect-1od1.onrender.com/department", formData, {
         "content-type": "multipart/form-data",
       }).then((d) => {
         Swal.fire("Success", d.data.message, "success");
@@ -80,7 +80,7 @@ function DepartmentAdmin() {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.put("http://localhost:8081/department", formData, {
+          axios.put("https://campusconnect-1od1.onrender.com/department", formData, {
             "content-type": "multipart/form-data",
           }).then((d) => {
             Swal.fire("Success", d.data.message, "success");
@@ -107,7 +107,7 @@ function DepartmentAdmin() {
         cancelButtonText: "Cancel"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.delete("http://localhost:8081/department", { data: { id: id } }).then((d) => {
+          axios.delete("https://campusconnect-1od1.onrender.com/department", { data: { id: id } }).then((d) => {
             Swal.fire("Success", d.data.message, "success");
             getDepartmentByUniversityId()
             resetForm()
@@ -158,7 +158,7 @@ function DepartmentAdmin() {
       return (
         <tr key={item._id} className="text-center align-middle">
           <td>
-            <img src={`http://localhost:8081/` + item.image} className="img-thumbnail" alt="Department" width="100" height="100" />
+            <img src={`https://campusconnect-1od1.onrender.com/` + item.image} className="img-thumbnail" alt="Department" width="100" height="100" />
           </td>
           <td>{item.name}</td>
           <td>{item.phoneNumber}</td>
