@@ -19,7 +19,7 @@ function UserAdmin() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/register");
+      const response = await axios.get("https://campusconnect-1od1.onrender.com/register");
       setUsers(response.data.users);
     } catch (error) {
       //   Swal.fire("Error", "Failed to fetch users", "error");
@@ -32,7 +32,7 @@ function UserAdmin() {
 
   const addUser = async () => {
     try {
-      await axios.post("http://localhost:8081/register", form);
+      await axios.post("https://campusconnect-1od1.onrender.com/register", form);
       Swal.fire("Success", "User added successfully!", "success");
       fetchUsers();
       setForm({ name: "", email: "", role: "user", password: "" });
@@ -52,7 +52,7 @@ function UserAdmin() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:8081/users/${id}`);
+          await axios.delete(`https://campusconnect-1od1.onrender.com/users/${id}`);
           Swal.fire("Deleted!", "User has been deleted.", "success");
           fetchUsers();
         } catch (error) {
