@@ -21,7 +21,7 @@ function UserCourse() {
     function getCourseByDepartmentId() {
         try {
             axios
-                .get("http://localhost:8081/courses?departmentId=" + query.get("id"))
+                .get("https://campusconnect-1od1.onrender.com/courses?departmentId=" + query.get("id"))
                 .then((response) => {
                     setCourses(response.data.crsData);
                     setFilteredCourses(response.data.crsData);
@@ -49,7 +49,7 @@ function UserCourse() {
             name: "Image",
             selector: (row) => (
                 <img
-                    src={`http://localhost:8081/${row.image}`}
+                    src={`https://campusconnect-1od1.onrender.com/${row.image}`}
                     alt={row.name}
                     style={{ width: "80px", height: "50px", objectFit: "cover" }}
                 />
