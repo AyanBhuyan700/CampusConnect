@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom'
 
 const Support = () => {
   return (
@@ -15,7 +16,7 @@ const Support = () => {
             <i className="bi bi-question-circle text-info display-4"></i>
             <h5 className="fw-semibold mt-3">FAQs</h5>
             <p className="text-muted">Find answers to questions.</p>
-            <a href="/faq" className="btn btn-info">View FAQs</a>
+            <Link to="/faq" className="btn btn-info">View FAQs</Link>
           </div>
         </div>
 
@@ -24,7 +25,7 @@ const Support = () => {
             <i className="bi bi-envelope text-info display-4"></i>
             <h5 className="fw-semibold mt-3">Contact Support</h5>
             <p className="text-muted">Reach out to our support team.</p>
-            <a href="/contact" className="btn btn-info">Contact Us</a>
+            <Link to="/contact" className="btn btn-info">Contact Us</Link>
           </div>
         </div>
 
@@ -33,7 +34,7 @@ const Support = () => {
             <i className="bi bi-tools text-info display-4"></i>
             <h5 className="fw-semibold mt-3">Submit a Request</h5>
             <p className="text-muted">Open a support ticket.</p>
-            <a href="/support-request" className="btn btn-info">Submit Request</a>
+            <Link to="/support-request" className="btn btn-info">Submit Request</Link>
           </div>
         </div>
       </div>

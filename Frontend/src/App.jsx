@@ -16,6 +16,7 @@ import Register from './containers/Register'
 import UserAdmin from './containers/Admin/UserAdmin'
 import Submit from './containers/Submit'
 import FAQ from './containers/Faq'
+import Footer from './components/Footer'
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path='/support-request' element={<Submit />}></Route>
         <Route path='/faq' element={<FAQ />}></Route>
       </Routes>
+      <Footer />
     </>
   )
 }
