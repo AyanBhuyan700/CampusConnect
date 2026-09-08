@@ -1,80 +1,162 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function About() {
+  const values = [
+    {
+      icon: "bi-shield-check",
+      title: "Integrity & Verification",
+      text: "Every university, department, and course on our network is verified directly against accredited records.",
+      color: "#4f46e5",
+      bg: "#eef2ff"
+    },
+    {
+      icon: "bi-globe-americas",
+      title: "Universal Access",
+      text: "We believe transparent academic data should be universally accessible to any aspiring student, anywhere.",
+      color: "#06b6d4",
+      bg: "#ecfeff"
+    },
+    {
+      icon: "bi-lightning-charge",
+      title: "Streamlined Discovery",
+      text: "Eliminating months of tedious application navigation through unified catalogs and real-time filtering.",
+      color: "#10b981",
+      bg: "#ecfdf5"
+    },
+    {
+      icon: "bi-people",
+      title: "Student-First Design",
+      text: "Built from the ground up prioritizing student clarity, fast responsiveness, and intuitive decision-making.",
+      color: "#f59e0b",
+      bg: "#fffbeb"
+    }
+  ];
+
   return (
-    <div className="container mx-auto px-6 py-12 max-w-5xl">
-      {/* Title Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-extrabold text-blue-700">About Us</h1>
-        <p className="text-lg text-gray-600 mt-3">
-          Connecting students with the best universities worldwide.
+    <div className="container py-5">
+      {/* Header */}
+      <div className="text-center mb-5">
+        <span className="section-badge">
+          <i className="bi bi-info-circle-fill"></i> Our Purpose
+        </span>
+        <h1 className="section-title">About CampusConnect</h1>
+        <p className="section-subtitle">
+          Empowering the next generation of scholars by bridging the gap between ambitious students and world-class universities.
         </p>
       </div>
 
-      {/* Introduction */}
-      <div className="bg-blue-50 p-6 rounded-lg shadow-md text-center">
-        <p className="text-lg text-gray-700">
-          Welcome to <span className="font-semibold text-blue-700">CampusConnect</span>, your trusted platform for discovering universities and their departments.
-          Whether you're a student, parent, or educator, we provide a{" "}
-          <strong>comprehensive</strong> and <strong>reliable</strong> directory to help you make informed decisions.
-        </p>
+      {/* Hero Mission Card */}
+      <div 
+        className="p-5 rounded-4 shadow-lg text-white mb-5 position-relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)",
+        }}
+      >
+        <div className="row align-items-center">
+          <div className="col-lg-8">
+            <span className="badge bg-white text-dark rounded-pill px-3 py-1 fw-bold mb-3">
+              🎯 The Mission
+            </span>
+            <h2 className="display-6 fw-bold text-white mb-3">
+              Democratizing Global Higher Education
+            </h2>
+            <p className="lead text-light mb-0" style={{ fontSize: "1.1rem", opacity: 0.9, lineHeight: "1.7" }}>
+              CampusConnect was created to eliminate the opacity and fragmentation of university admissions. We provide an integrated, trustworthy directory where learners can explore faculties, course curriculums, contact departments, and plan their future with total clarity.
+            </p>
+          </div>
+          <div className="col-lg-4 text-center mt-4 mt-lg-0">
+            <div 
+              className="d-inline-flex align-items-center justify-content-center rounded-circle text-white shadow-lg animate-float"
+              style={{
+                width: "120px",
+                height: "120px",
+                background: "linear-gradient(135deg, #06b6d4 0%, #10b981 100%)",
+                fontSize: "3rem"
+              }}
+            >
+              <i className="bi bi-mortarboard-fill"></i>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Our Mission */}
-      <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-3xl font-semibold text-blue-700 flex items-center gap-2">
-          🎯 Our Mission
-        </h2>
-        <p className="text-lg text-gray-700 mt-3">
-          Our mission is to <strong>bridge the gap between students and higher education institutions</strong> by providing an intuitive platform with{" "}
-          <strong>accurate and up-to-date information</strong>. We aim to simplify the university search process and help students find the perfect institution that aligns with their goals.
-        </p>
+      {/* Core Values Grid */}
+      <div className="mb-5">
+        <div className="text-center mb-4">
+          <h3 className="fw-bold text-dark">Our Guiding Values</h3>
+          <p className="text-muted small">The foundational pillars behind every platform feature</p>
+        </div>
+
+        <div className="row g-4">
+          {values.map((v, idx) => (
+            <div key={idx} className="col-md-6 col-lg-3">
+              <div className="glass-card p-4 h-100 hover-lift d-flex flex-column">
+                <div 
+                  className="feature-icon-box"
+                  style={{ backgroundColor: v.bg, color: v.color }}
+                >
+                  <i className={`bi ${v.icon}`}></i>
+                </div>
+                <h5 className="fw-bold text-dark mb-2 fs-6">{v.title}</h5>
+                <p className="text-muted small mb-0 flex-grow-1" style={{ lineHeight: "1.6" }}>
+                  {v.text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* What We Offer */}
-      <div className="mt-12">
-        <h2 className="text-3xl font-semibold text-blue-700 flex items-center gap-2">
-          🎁 What We Offer
-        </h2>
-        <ul className="list-none text-lg text-gray-700 mt-4 space-y-3">
-          <li>📚 <strong>A vast database</strong> of universities and departments worldwide.</li>
-          <li>📖 Detailed insights on <strong>courses, faculty, tuition fees, and campus facilities</strong>.</li>
-          <li>🔍 <strong>Smart search filters</strong> to help you find universities based on your preferences.</li>
-          <li>🌎 <strong>User-friendly interface</strong> for seamless browsing.</li>
-          <li>🆕 <strong>Regular updates</strong> to ensure <strong>accurate and fresh information</strong>.</li>
-        </ul>
-      </div>
-
-      {/* Why Choose Us? */}
-      <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-3xl font-semibold text-blue-700 flex items-center gap-2">
-          ✅ Why Choose Us?
-        </h2>
-        <ul className="list-none text-lg text-gray-700 mt-4 space-y-3">
-          <li>🎓 <span className="font-semibold">Comprehensive Listings:</span> Universities from across the world, all in one place.</li>
-          <li>✅ <span className="font-semibold">Accurate & Verified Information:</span> We ensure all data is <strong>trustworthy and up to date</strong>.</li>
-          <li>💡 <span className="font-semibold">User-Centric Experience:</span> Designed to be <strong>simple, interactive, and informative</strong>.</li>
-          <li>🚀 <span className="font-semibold">Smart Filters:</span> Easily refine your search based on <strong>location, programs, rankings, and more</strong>.</li>
-          <li>🔄 <span className="font-semibold">Continuous Improvement:</span> We constantly upgrade our platform with <strong>new features and insights</strong>.</li>
-        </ul>
-      </div>
-
-      {/* Our Vision */}
-      <div className="mt-12 bg-blue-50 p-6 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-semibold text-blue-700 flex items-center gap-2">
-          👁️ Our Vision
-        </h2>
-        <p className="text-lg text-gray-700 mt-3">
-          We envision a world where students can access higher education opportunities <strong>easily and transparently</strong>.
-          By leveraging <strong>technology and data</strong>, we strive to make university discovery <strong>simple, reliable, and accessible</strong> for everyone.
-        </p>
-      </div>
-
-      {/* Call to Action */}
-      <div className="text-center mt-12">
-        <p className="text-xl text-gray-700 font-semibold">
-          <span className="text-blue-700">Explore, Compare, and Choose</span> the best university for your future!
-        </p>
+      {/* What We Offer Highlights */}
+      <div className="glass-card p-4 p-md-5 mb-5 shadow-sm">
+        <div className="row g-4 align-items-center">
+          <div className="col-lg-6">
+            <span className="section-badge">
+              <i className="bi bi-gift-fill"></i> Platform Ecosystem
+            </span>
+            <h3 className="fw-bold text-dark mb-3">
+              Everything You Need in One Unified Academic Hub
+            </h3>
+            <p className="text-secondary small mb-4" style={{ lineHeight: "1.7" }}>
+              From initial university research to reviewing individual course syllabi and inquiring directly with faculties, CampusConnect simplifies your application journey.
+            </p>
+            <ul className="list-unstyled d-flex flex-column gap-3 small">
+              <li className="d-flex align-items-start gap-2">
+                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                <span><strong>500+ Verified Universities:</strong> Global institution profiles with official portals, founded dates, and rankings.</span>
+              </li>
+              <li className="d-flex align-items-start gap-2">
+                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                <span><strong>Detailed Department Breakdowns:</strong> Direct access to department faculties, phones, and academic divisions.</span>
+              </li>
+              <li className="d-flex align-items-start gap-2">
+                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                <span><strong>Course Duration & Tuition:</strong> Transparent program pricing, durations in weeks, and prerequisites.</span>
+              </li>
+              <li className="d-flex align-items-start gap-2">
+                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                <span><strong>Instant Support & Guidance:</strong> Fast inquiry channels and responsive student assistance.</span>
+              </li>
+            </ul>
+          </div>
+          <div className="col-lg-6">
+            <div className="p-4 rounded-4 bg-light border border-secondary border-opacity-10 text-center">
+              <h4 className="fw-bold text-dark mb-2">Join CampusConnect Today</h4>
+              <p className="text-muted small mb-4">
+                Start discovering universities and comparing academic curricula right now.
+              </p>
+              <div className="d-flex justify-content-center gap-3">
+                <Link to="/university" className="btn-premium-primary">
+                  Explore Directory
+                </Link>
+                <Link to="/register" className="btn-premium-outline">
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

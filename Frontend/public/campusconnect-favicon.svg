@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle with gradient -->
+  <rect width="64" height="64" rx="16" fill="url(#primaryGrad)"/>
+
+  <!-- Inner border ring -->
+  <rect x="1" y="1" width="62" height="62" rx="15" stroke="white" stroke-opacity="0.25" stroke-width="1.5" fill="none"/>
+
+  <!-- Mortarboard Top -->
+  <path d="M32 17L50 26L32 34.5L14 26L32 17Z" fill="white" filter="url(#glow)"/>
+
+  <!-- Cap Lower Base -->
+  <path d="M22 31V37.5C22 41.5 26.5 44.5 32 44.5C37.5 44.5 42 41.5 42 37.5V31L32 35.8L22 31Z" fill="white" fill-opacity="0.95"/>
+
+  <!-- Tassel Cord & Ornament -->
+  <path d="M44 28V37.5" stroke="url(#sparkGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="44" cy="40" r="2.5" fill="url(#sparkGrad)"/>
+
+  <!-- Center Pivot Spark -->
+  <circle cx="32" cy="25.8" r="2" fill="url(#sparkGrad)"/>
+</svg>

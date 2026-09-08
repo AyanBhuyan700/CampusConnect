@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { data, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 function Register() {
     const [form, setForm] = useState({
@@ -14,6 +14,8 @@ function Register() {
     });
 
     const [formError, setFormError] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const changeHandler = (e) => {
@@ -21,20 +23,38 @@ function Register() {
             ...prevForm,
             [e.target.name]: e.target.value
         }));
+        if (formError[e.target.name]) {
+            setFormError(prev => ({ ...prev, [e.target.name]: "" }));
+        }
     };
 
     function registerUser() {
+        setLoading(true);
         axios.post("https://campusconnect-1od1.onrender.com/register", form)
             .then((d) => {
-                Swal.fire("Success", d.data.message, "success");
-                navigate('/login');
+                setLoading(false);
+                Swal.fire({
+                    icon: "success",
+                    title: "Registration Successful!",
+                    text: d.data.message || "Your student account has been created. Please sign in.",
+                    confirmButtonColor: "#4f46e5"
+                }).then(() => {
+                    navigate('/login');
+                });
             })
             .catch(error => {
-                console.log("Registration Error:", error);
+                setLoading(false);
+                Swal.fire({
+                    icon: "error",
+                    title: "Registration Failed",
+                    text: error.response?.data?.message || "Something went wrong during registration. Please try again.",
+                    confirmButtonColor: "#4f46e5"
+                });
             });
     }
 
-    function onSubmitUser() {
+    function onSubmitUser(e) {
+        e.preventDefault();
         let errors = {};
         let isValid = true;
 
@@ -61,7 +81,7 @@ function Register() {
             errors.password = "Password is required.";
         } else if (form.password.length < 6) {
             isValid = false;
-            errors.password = "Password must be at least 6 characters long.";
+            errors.password = "Must be at least 6 characters.";
         }
 
         if (form.confirmPassword !== form.password) {
@@ -77,57 +97,193 @@ function Register() {
     }
 
     return (
-        <div className="container mt-5 pt-4"> {/* Prevent navbar overlap */}
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card shadow-lg border-0">
-                        <div className="card-header bg-info text-white text-center">
-                            <h4>Register</h4>
+        <div className="auth-bg-gradient py-5 d-flex align-items-center justify-content-center" style={{ minHeight: "85vh" }}>
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-md-10 col-lg-7 col-xl-6">
+                        {/* Header */}
+                        <div className="text-center mb-4">
+                            <div 
+                                className="d-inline-flex align-items-center justify-content-center rounded-4 shadow-sm mb-3"
+                                style={{
+                                    width: "56px",
+                                    height: "56px",
+                                    background: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
+                                    color: "#fff"
+                                }}
+                            >
+                                <i className="bi bi-mortarboard-fill fs-3"></i>
+                            </div>
+                            <h2 className="fw-extrabold text-dark mb-1" style={{ letterSpacing: "-0.02em" }}>
+                                Create Your Account
+                            </h2>
+                            <p className="text-muted small">
+                                Join the global academic network to track applications and access course catalogs
+                            </p>
                         </div>
-                        <div className="card-body">
-                            <form>
-                                <div className="mb-3">
-                                    <label className="form-label">First Name</label>
-                                    <input type="text" className="form-control" name="firstname" value={form.firstname} onChange={changeHandler} />
-                                    <small className="text-danger">{formError.firstname}</small>
+
+                        {/* Registration Card */}
+                        <div className="glass-card p-4 p-sm-5 shadow-xl">
+                            <form onSubmit={onSubmitUser}>
+                                {/* Name Fields (Grid) */}
+                                <div className="row g-3 mb-3">
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold text-dark">
+                                            First Name <span className="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className={`form-control ${formError.firstname ? 'is-invalid border-danger' : ''}`}
+                                            name="firstname"
+                                            placeholder="John"
+                                            value={form.firstname}
+                                            onChange={changeHandler}
+                                        />
+                                        {formError.firstname && (
+                                            <div className="text-danger small mt-1">{formError.firstname}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold text-dark">
+                                            Last Name <span className="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className={`form-control ${formError.lastname ? 'is-invalid border-danger' : ''}`}
+                                            name="lastname"
+                                            placeholder="Doe"
+                                            value={form.lastname}
+                                            onChange={changeHandler}
+                                        />
+                                        {formError.lastname && (
+                                            <div className="text-danger small mt-1">{formError.lastname}</div>
+                                        )}
+                                    </div>
                                 </div>
 
+                                {/* Middle Name */}
                                 <div className="mb-3">
-                                    <label className="form-label">Middle Name</label>
-                                    <input type="text" className="form-control" name="middlename" value={form.middlename} onChange={changeHandler} />
+                                    <label className="form-label small fw-semibold text-dark">
+                                        Middle Name <span className="text-muted small fw-normal">(Optional)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="middlename"
+                                        placeholder="Alexander"
+                                        value={form.middlename}
+                                        onChange={changeHandler}
+                                    />
                                 </div>
 
+                                {/* Email Field */}
                                 <div className="mb-3">
-                                    <label className="form-label">Last Name</label>
-                                    <input type="text" className="form-control" name="lastname" value={form.lastname} onChange={changeHandler} />
-                                    <small className="text-danger">{formError.lastname}</small>
+                                    <label className="form-label small fw-semibold text-dark">
+                                        Email Address <span className="text-danger">*</span>
+                                    </label>
+                                    <div className="input-icon-wrapper">
+                                        <i className="bi bi-envelope"></i>
+                                        <input
+                                            type="email"
+                                            className={`form-control ${formError.email ? 'is-invalid border-danger' : ''}`}
+                                            name="email"
+                                            placeholder="student@example.com"
+                                            value={form.email}
+                                            onChange={changeHandler}
+                                        />
+                                    </div>
+                                    {formError.email && (
+                                        <div className="text-danger small mt-1">{formError.email}</div>
+                                    )}
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Email</label>
-                                    <input type="email" className="form-control" name="email" value={form.email} onChange={changeHandler} />
-                                    <small className="text-danger">{formError.email}</small>
+                                {/* Password Fields (Grid) */}
+                                <div className="row g-3 mb-4">
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold text-dark">
+                                            Password <span className="text-danger">*</span>
+                                        </label>
+                                        <div className="input-icon-wrapper position-relative">
+                                            <i className="bi bi-lock"></i>
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                className={`form-control ${formError.password ? 'is-invalid border-danger' : ''}`}
+                                                name="password"
+                                                placeholder="Min 6 characters"
+                                                value={form.password}
+                                                onChange={changeHandler}
+                                                style={{ paddingRight: "2.5rem" }}
+                                            />
+                                        </div>
+                                        {formError.password && (
+                                            <div className="text-danger small mt-1">{formError.password}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label className="form-label small fw-semibold text-dark">
+                                            Confirm Password <span className="text-danger">*</span>
+                                        </label>
+                                        <div className="input-icon-wrapper position-relative">
+                                            <i className="bi bi-check2-circle"></i>
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                className={`form-control ${formError.confirmPassword ? 'is-invalid border-danger' : ''}`}
+                                                name="confirmPassword"
+                                                placeholder="Repeat password"
+                                                value={form.confirmPassword}
+                                                onChange={changeHandler}
+                                                style={{ paddingRight: "2.5rem" }}
+                                            />
+                                        </div>
+                                        {formError.confirmPassword && (
+                                            <div className="text-danger small mt-1">{formError.confirmPassword}</div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Password</label>
-                                    <input type="password" className="form-control" name="password" value={form.password} onChange={changeHandler} />
-                                    <small className="text-danger">{formError.password}</small>
+                                {/* Toggle Password Visibility */}
+                                <div className="form-check mb-4">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="showPasswordCheck"
+                                        checked={showPassword}
+                                        onChange={() => setShowPassword(!showPassword)}
+                                    />
+                                    <label className="form-check-label small text-muted" htmlFor="showPasswordCheck">
+                                        Show passwords in plain text
+                                    </label>
                                 </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Confirm Password</label>
-                                    <input type="password" className="form-control" name="confirmPassword" value={form.confirmPassword} onChange={changeHandler} />
-                                    <small className="text-danger">{formError.confirmPassword}</small>
-                                </div>
-
-                                <div className="d-grid">
-                                    <button type="button" className="btn btn-info " onClick={onSubmitUser}>Register</button>
-                                </div>
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    className="btn-premium-primary w-100 py-2.5 rounded-3 mb-3 fw-bold"
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            <span>Creating Account...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Complete Registration</span>
+                                            <i className="bi bi-arrow-right-short fs-5"></i>
+                                        </>
+                                    )}
+                                </button>
                             </form>
-                        </div>
-                        <div className="card-footer text-center text-muted">
-                            Already have an account? <a href="/login" className="text-primary">Login</a>
+
+                            {/* Back to Login */}
+                            <div className="text-center pt-3 border-top border-light small text-secondary">
+                                Already have an account?{" "}
+                                <Link to="/login" className="text-primary fw-bold text-decoration-none">
+                                    Sign In Here
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

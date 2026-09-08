@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router-dom'
 import About from './containers/About'
 import Contact from './containers/Contact'
 import Support from './containers/Support'
-import Home from '../src/containers/User/Home'
+import Home from './containers/User/Home'
 import UniversityAdmin from './containers/Admin/UniversityAdmin'
 import DepartmentAdmin from './containers/Admin/DepartmentAdmin'
 import UserDepartment from './containers/User/UserDepartment'
@@ -17,31 +17,33 @@ import UserAdmin from './containers/Admin/UserAdmin'
 import Submit from './containers/Submit'
 import FAQ from './containers/Faq'
 import Footer from './components/Footer'
-
+import './App.css'
 
 function App() {
   return (
-    <>
+    <div className="app-wrapper">
       <Navbar />
-      <Routes>
-        <Route path='/' element={<Main />}></Route>
-        <Route path='/university' element={<Home />}></Route>
-        <Route path='/about' element={<About />}></Route>
-        <Route path='/contact' element={<Contact />}></Route>
-        <Route path='/support' element={<Support />}></Route>
-        <Route path='/universityAdmin' element={<UniversityAdmin />}></Route>
-        <Route path='/departmentAdmin' element={<DepartmentAdmin />}></Route>
-        <Route path='/courseAdmin' element={<CourseAdmin />}></Route>
-        <Route path='/userAdmin' element={<UserAdmin />}></Route>
-        <Route path='/userDepartment' element={<UserDepartment />}></Route>
-        <Route path='/userCourse' element={<UserCourse />}></Route>
-        <Route path='/login' element={<Login />}></Route>
-        <Route path='/register' element={<Register />}></Route>
-        <Route path='/support-request' element={<Submit />}></Route>
-        <Route path='/faq' element={<FAQ />}></Route>
-      </Routes>
+      <main className="main-content">
+        <Routes>
+          <Route path='/' element={<Main />} />
+          <Route path='/university' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/support' element={<Support />} />
+          <Route path='/universityAdmin' element={<UniversityAdmin />} />
+          <Route path='/departmentAdmin' element={<DepartmentAdmin />} />
+          <Route path='/courseAdmin' element={<CourseAdmin />} />
+          <Route path='/userAdmin' element={<UserAdmin />} />
+          <Route path='/userDepartment' element={<UserDepartment />} />
+          <Route path='/userCourse' element={<UserCourse />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/support-request' element={<Submit />} />
+          <Route path='/faq' element={<FAQ />} />
+        </Routes>
+      </main>
       <Footer />
-    </>
+    </div>
   )
 }
 
