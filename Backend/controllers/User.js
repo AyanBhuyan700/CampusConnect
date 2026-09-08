@@ -1,56 +1,83 @@
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
-import { generateToken } from '../utils/generateToken.js'
+import { generateToken } from '../utils/generateToken.js';
 
-export const registerUser = async (req, res) => {
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+};
+
+export const registerUser = async (req, res, next) => {
     try {
-        let { firstname, middlename, lastname, email, password } = req.body;
-        let user = await User.findOne({ email: email });
-        if (user) {
-            return res.status(400).json({ message: 'User already exists' });
-        } else {
-            bcrypt.genSalt(10, function (err, salt) {
-                bcrypt.hash(password, salt, async function (err, hash) {
-                    const newUser = await User.create({
-                        firstname,
-                        middlename,
-                        lastname,
-                        email,
-                        password: hash
-                    });
-                    let token = generateToken(newUser);
-                    res.cookie('token', token);
-                    res.send(newUser)
-                });
-            });
+        const { firstname, middlename, lastname, email, password } = req.body;
+
+        if (!email || !password || !firstname || !lastname) {
+            return res.status(400).json({ message: 'Firstname, lastname, email, and password are required' });
         }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const existingUser = await User.findOne({ email: normalizedEmail });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Modern async bcrypt hash (10 salt rounds)
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await User.create({
+            firstname: firstname.trim(),
+            middlename: middlename ? middlename.trim() : "",
+            lastname: lastname.trim(),
+            email: normalizedEmail,
+            password: hashedPassword
+        });
+
+        const token = generateToken(newUser);
+        res.cookie('token', token, COOKIE_OPTIONS);
+
+        // Omit hashed password from response for security
+        const userResponse = newUser.toJSON();
+
+        return res.status(201).json({
+            message: 'User registered successfully',
+            user: userResponse
+        });
     } catch (error) {
-        console.error('Error in registerUser:', error);
-        res.status(500).json({ message: 'Something went wrong' });
+        next(error);
     }
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
     try {
-        let { email, password } = req.body;
-        let user = await User.findOne({ email: email });
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const user = await User.findOne({ email: normalizedEmail });
         if (!user) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-        else {
-            bcrypt.compare(password, user.password, function (err, result) {
-                if (result) {
-                    let token = generateToken(user);
-                    res.cookie('token', token);
-                    res.send({ id: user._id, role: user.role })
-                }
-                else {
-                    res.status(400).json({ message: 'Invalid email or password' });
-                }
-            });
-        }
-    } catch (err) {
-        console.log(err.message);
 
+        // Modern async bcrypt compare
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid email or password' });
+        }
+
+        const token = generateToken(user);
+        res.cookie('token', token, COOKIE_OPTIONS);
+
+        return res.status(200).json({
+            message: 'Login successful',
+            id: user._id,
+            role: user.role
+        });
+    } catch (err) {
+        next(err);
     }
 };

@@ -3,33 +3,40 @@ import mongoose from "mongoose";
 const universitySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        required: [true, "University name is required"],
+        trim: true
     },
     location: {
         type: String,
-        required: true
+        required: [true, "Location is required"],
+        trim: true
     },
     foundedYear: {
         type: Number,
-        required: true,
-        min: 1000
+        required: [true, "Founded year is required"],
+        min: [1000, "Founded year must be at least 1000"]
     },
     website: {
         type: String,
         lowercase: true,
-        required: true,
-        match: [/^(https?:\/\/)?([\w-]+(\.[\w-]+)+\/?)([\w.,@?^=%&:/~+#-]*)?$/, "Please enter a valid email"]
+        trim: true,
+        required: [true, "Website is required"],
+        match: [/^(https?:\/\/)?([\w-]+(\.[\w-]+)+\/?)([\w.,@?^=%&:/~+#-]*)?$/, "Please enter a valid website URL"]
     },
     ranking: {
         type: Number,
-        required: true,
-        min: 1
+        required: [true, "Ranking is required"],
+        min: [1, "Ranking must be a positive number"]
     },
     image: {
         type: String,
-        required: true
+        required: [true, "Image filename is required"]
     }
 }, { timestamps: true });
+
+// Index for sorting and search performance
+universitySchema.index({ ranking: 1 });
+universitySchema.index({ name: 1 });
 
 const University = mongoose.model("university", universitySchema);
 export default University;

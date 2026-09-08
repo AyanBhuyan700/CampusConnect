@@ -1,109 +1,124 @@
 import Department from '../models/Department.js';
-import fs from 'fs';
-import path from 'path';
+import { deleteFileIfExists } from '../utils/fileHelper.js';
 
-const uploadPath = path.join("uploadDep"); // Adjust this based on your actual upload folder
+const UPLOAD_DIR = "uploadDep";
 
-export const createDepartment = async (req, res) => {
+export const createDepartment = async (req, res, next) => {
     try {
-        let { name, phoneNumber, facultyCount, universityId } = req.body;
+        const { name, phoneNumber, facultyCount, universityId } = req.body;
+        const image = req.file ? req.file.filename : "";
+
+        if (!image) {
+            return res.status(400).json({ message: "Department image is required" });
+        }
+
+        if (!universityId) {
+            return res.status(400).json({ message: "University ID is required" });
+        }
+
         const depData = await Department.create({
             name,
-            phoneNumber,
-            facultyCount,
-            image: req?.file?.filename,
+            phoneNumber: Number(phoneNumber),
+            facultyCount: Number(facultyCount) || 0,
+            image,
             university: universityId
         });
 
-        if (depData) {
-            res.status(200).send({ message: "Department Created" });
-        } else {
-            res.status(401).send({ message: "Unable to create department" });
-        }
+        return res.status(201).json({ message: "Department Created", data: depData });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        if (req.file?.filename) {
+            await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
+        }
+        next(err);
     }
 };
 
-export const updateDepartment = async (req, res) => {
+export const updateDepartment = async (req, res, next) => {
     try {
-        let { id, name, phoneNumber, facultyCount, universityId } = req.body;
+        const { id, name, phoneNumber, facultyCount, universityId } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ message: "Department ID is required" });
+        }
+
         const existingDep = await Department.findById(id);
-
         if (!existingDep) {
-            return res.status(404).send({ message: "Department not found" });
-        }
-
-        // If a new image is uploaded, delete the old one
-        if (req.file && existingDep.image) {
-            const oldImagePath = path.join(uploadPath, existingDep.image);
-            if (fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
+            if (req.file?.filename) {
+                await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
             }
+            return res.status(404).json({ message: "Department not found" });
         }
 
-        const updatedDep = await Department.findByIdAndUpdate(
-            id,
-            {
-                name,
-                phoneNumber,
-                facultyCount,
-                image: req?.file?.filename || existingDep.image, // Keep old image if no new one
-                university: universityId
-            },
-            { new: true }
-        );
-
-        if (updatedDep) {
-            res.status(200).send({ message: "Department Updated" });
-        } else {
-            res.status(401).send({ message: "Unable to update department" });
+        // Asynchronously delete old image if a new image was uploaded
+        if (req.file?.filename && existingDep.image) {
+            await deleteFileIfExists(UPLOAD_DIR, existingDep.image);
         }
+
+        const updatePayload = {
+            name: name ?? existingDep.name,
+            phoneNumber: phoneNumber !== undefined ? Number(phoneNumber) : existingDep.phoneNumber,
+            facultyCount: facultyCount !== undefined ? Number(facultyCount) : existingDep.facultyCount,
+            image: req.file ? req.file.filename : existingDep.image,
+            university: universityId ?? existingDep.university
+        };
+
+        const updatedDep = await Department.findByIdAndUpdate(id, updatePayload, {
+            new: true,
+            runValidators: true
+        });
+
+        return res.status(200).json({ message: "Department Updated", data: updatedDep });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        if (req.file?.filename) {
+            await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
+        }
+        next(err);
     }
 };
 
-export const deleteDepartment = async (req, res) => {
+export const deleteDepartment = async (req, res, next) => {
     try {
-        const { id } = req.body;
-        const depData = await Department.findById(id);
+        const id = req.body?.id || req.params?.id;
 
-        if (!depData) {
-            return res.status(404).send({ message: "Department not found" });
+        if (!id) {
+            return res.status(400).json({ message: "Department ID is required" });
         }
 
-        // Delete the image if it exists
+        const depData = await Department.findById(id);
+        if (!depData) {
+            return res.status(404).json({ message: "Department not found" });
+        }
+
         if (depData.image) {
-            const imagePath = path.join(uploadPath, depData.image);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
+            await deleteFileIfExists(UPLOAD_DIR, depData.image);
         }
 
         await Department.deleteOne({ _id: id });
-
-        res.status(200).send({ message: "Department Deleted" });
+        return res.status(200).json({ message: "Department Deleted" });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        next(err);
     }
 };
 
-export const GetDepartmentByUniversityId = async (req, res) => {
+export const GetDepartmentByUniversityId = async (req, res, next) => {
     try {
         const { universityId } = req.query;
-        const depData = await Department.find({ university: universityId }).populate("university");
+
+        if (!universityId) {
+            return res.status(400).json({ message: "universityId query parameter is required" });
+        }
+
+        // Leverage indexed university field and .lean() for fast query execution
+        const depData = await Department.find({ university: universityId })
+            .populate("university")
+            .lean();
 
         if (depData.length > 0) {
-            res.status(200).send({ depData });
+            return res.status(200).json({ depData });
         } else {
-            res.status(404).send({ message: "No departments found for this university" });
+            return res.status(404).json({ message: "No departments found for this university", depData: [] });
         }
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        next(err);
     }
 };

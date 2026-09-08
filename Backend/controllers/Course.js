@@ -1,139 +1,156 @@
 import Courses from "../models/Courses.js";
-import fs from "fs";
-import path from "path";
+import { deleteFileIfExists } from "../utils/fileHelper.js";
 
-const uploadPath = path.join("uploadCrs"); // Folder for storing images
+const UPLOAD_DIR = "uploadCrs";
 
-export const createCourse = async (req, res) => {
+export const createCourse = async (req, res, next) => {
     try {
-        let image = req?.file?.filename || ""; // Single image
-        let { name, code, duration, price, description, departmentId } = req.body;
+        const image = req.file ? req.file.filename : "";
+        const { name, code, duration, price, description, departmentId } = req.body;
+
+        if (!image) {
+            return res.status(400).json({ message: "Course image is required" });
+        }
+
+        if (!departmentId) {
+            return res.status(400).json({ message: "Department ID is required" });
+        }
 
         const crsData = await Courses.create({
             name,
             code,
-            duration,
-            price,
+            duration: Number(duration),
+            price: Number(price),
             description,
             image,
             department: departmentId
         });
 
-        if (crsData) {
-            res.status(200).send({ message: "Course Created" });
-        } else {
-            res.status(401).send({ message: "Unable to create course" });
-        }
+        return res.status(201).json({ message: "Course Created", data: crsData });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        if (req.file?.filename) {
+            await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
+        }
+        next(err);
     }
 };
 
-export const updateCourse = async (req, res) => {
+export const updateCourse = async (req, res, next) => {
     try {
-        let image = req?.file?.filename || "";
-        let { id, name, code, duration, price, description, departmentId } = req.body;
+        const { id, name, code, duration, price, description, departmentId } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ message: "Course ID is required" });
+        }
 
         const existingCourse = await Courses.findById(id);
         if (!existingCourse) {
-            return res.status(404).send({ message: "Course not found" });
-        }
-
-        // Delete old image if a new one is uploaded
-        if (image && existingCourse.image) {
-            const oldImagePath = path.join(uploadPath, existingCourse.image);
-            if (fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
+            if (req.file?.filename) {
+                await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
             }
+            return res.status(404).json({ message: "Course not found" });
         }
 
-        const updatedCourse = await Courses.findByIdAndUpdate(
-            id,
-            {
-                name,
-                code,
-                duration,
-                price,
-                description,
-                image: image || existingCourse.image, // Keep old image if no new one
-                department: departmentId
-            },
-            { new: true }
-        );
-
-        if (updatedCourse) {
-            res.status(200).send({ message: "Course Updated" });
-        } else {
-            res.status(401).send({ message: "Unable to update course" });
+        // Delete old image asynchronously if a new one is provided
+        if (req.file?.filename && existingCourse.image) {
+            await deleteFileIfExists(UPLOAD_DIR, existingCourse.image);
         }
+
+        const updatePayload = {
+            name: name ?? existingCourse.name,
+            code: code ?? existingCourse.code,
+            duration: duration !== undefined ? Number(duration) : existingCourse.duration,
+            price: price !== undefined ? Number(price) : existingCourse.price,
+            description: description ?? existingCourse.description,
+            image: req.file ? req.file.filename : existingCourse.image,
+            department: departmentId ?? existingCourse.department
+        };
+
+        const updatedCourse = await Courses.findByIdAndUpdate(id, updatePayload, {
+            new: true,
+            runValidators: true
+        });
+
+        return res.status(200).json({ message: "Course Updated", data: updatedCourse });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        if (req.file?.filename) {
+            await deleteFileIfExists(UPLOAD_DIR, req.file.filename);
+        }
+        next(err);
     }
 };
 
-export const deleteCourse = async (req, res) => {
+export const deleteCourse = async (req, res, next) => {
     try {
-        const { id } = req.body;
-        const crsData = await Courses.findById(id);
+        const id = req.body?.id || req.params?.id;
 
-        if (!crsData) {
-            return res.status(404).send({ message: "Course not found" });
+        if (!id) {
+            return res.status(400).json({ message: "Course ID is required" });
         }
 
-        // Delete image if it exists
+        const crsData = await Courses.findById(id);
+        if (!crsData) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
         if (crsData.image) {
-            const imagePath = path.join(uploadPath, crsData.image);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
+            await deleteFileIfExists(UPLOAD_DIR, crsData.image);
         }
 
         await Courses.deleteOne({ _id: id });
-
-        res.status(200).send({ message: "Course Deleted" });
+        return res.status(200).json({ message: "Course Deleted" });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        next(err);
     }
 };
 
-export const GetCoursesByDepartmentId = async (req, res) => {
+export const GetCoursesByDepartmentId = async (req, res, next) => {
     try {
         const { departmentId } = req.query;
-        const crsData = await Courses.find({ department: departmentId }).populate({
-            path: "department",
-            populate: [{ path: "university" }]
-        });
+
+        if (!departmentId) {
+            return res.status(400).json({ message: "departmentId query parameter is required" });
+        }
+
+        // Use indexed department field and .lean() for fast read with deep population
+        const crsData = await Courses.find({ department: departmentId })
+            .populate({
+                path: "department",
+                populate: [{ path: "university" }]
+            })
+            .lean();
 
         if (crsData.length > 0) {
-            res.status(200).send({ crsData });
+            return res.status(200).json({ crsData });
         } else {
-            res.status(404).send({ message: "No courses found for this department" });
+            return res.status(404).json({ message: "No courses found for this department", crsData: [] });
         }
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send({ message: "Internal Server Error" });
+        next(err);
     }
 };
 
-export const getCourseDetails = async (req, res) => {
+export const getCourseDetails = async (req, res, next) => {
     try {
         const { id } = req.query;
-        const crsData = await Courses.findOne({ _id: id }).populate({
-            path: "department",
-            populate: [{ path: "university" }]
-        });
+
+        if (!id) {
+            return res.status(400).json({ message: "Course ID is required" });
+        }
+
+        const crsData = await Courses.findById(id)
+            .populate({
+                path: "department",
+                populate: [{ path: "university" }]
+            })
+            .lean();
 
         if (crsData) {
-            res.status(200).send({ crsData });
+            return res.status(200).json({ crsData });
         } else {
-            res.status(404).send({ message: "Course not found" });
+            return res.status(404).json({ message: "Course not found" });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).send({ message: "Internal Server Error" });
+        next(err);
     }
 };
-
